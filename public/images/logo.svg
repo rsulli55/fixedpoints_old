@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 300 300">  
+<style>
+.main { font: italic 30px math;}
+.func { font: italic 24px math;}
+</style>
+<text x = "23" y = "49" class = "main">x</text>
+<line x1 = "44" y1 = "42" x2 = "85" y2 = "42" style = "stroke-width: 2" stroke="black" stroke-linecap = "round" />
+<line x1 = "44" y1 = "36" x2 = "44" y2 = "48" style = "stroke-width: 2" stroke="black" stroke-linecap="round"/>
+<line x1 = "80" y1 = "35" x2 = "86" y2 = "42" style = "stroke-width: 2" stroke="black" stroke-linecap="round" />
+<line x1 = "80" y1 = "49" x2 = "86" y2 = "42" style = "stroke-width: 2" stroke="black" stroke-linecap="round" />
+<text x = "63" y = "33" class = "func">f</text>
+<text x = "90" y = "49" class = "main">x</text>
+</svg>

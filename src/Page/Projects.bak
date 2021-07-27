@@ -1,0 +1,447 @@
+module Page.Projects exposing (Data, Model, Msg, page)
+
+import Browser.Navigation
+import Constants exposing (..)
+import DataSource exposing (DataSource)
+import DataSource.File
+import DataSource.Glob as Glob
+import DataSource.Http
+import Dict exposing (Dict)
+import Element exposing (Element)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
+import Element.Input as Input
+import Head
+import Head.Seo as Seo
+import Html
+import Iso8601
+import List.Extra
+import MdRendering exposing (MdMsg)
+import OptimizedDecoder as Decode
+import Page exposing (Page, PageWithState, StaticPayload)
+import Pages.PageUrl exposing (PageUrl)
+import Pages.Url
+import Parser
+import Path exposing (Path)
+import Secrets
+import Shared
+import Time
+import Url.Builder as UrlBuilder
+import View exposing (View)
+
+
+
+-- Repo info made through Github API request
+
+
+type alias Repo =
+    { name : String
+    , htmlUrl : String
+    , description : Maybe String
+    , language : Maybe String
+    , updatedAt : String
+    }
+
+
+type alias Project =
+    { repo : Repo
+    , details : String
+    , expanded : Bool
+    }
+
+
+type alias RepoDetails =
+    String
+
+
+
+-- sorting Posix time
+-- https://stackoverflow.com/questions/60550236/sorting-list-of-objects-containing-maybe-time-posix
+
+
+maybeCompare : (a -> a -> Order) -> Maybe a -> Maybe a -> Order
+maybeCompare f a b =
+    case a of
+        Just some_a ->
+            case b of
+                Just some_b ->
+                    f some_a some_b
+
+                Nothing ->
+                    GT
+
+        Nothing ->
+            LT
+
+
+posixCompare : Time.Posix -> Time.Posix -> Order
+posixCompare a b =
+    compare (Time.posixToMillis a) (Time.posixToMillis b)
+
+
+timeWithDefault : Result (List Parser.DeadEnd) Time.Posix -> Time.Posix
+timeWithDefault time =
+    let
+        -- Jan 1st 2010
+        defaultTime =
+            Time.millisToPosix 1262304000000
+    in
+    Result.withDefault defaultTime time
+
+
+timeCompare :
+    Result (List Parser.DeadEnd) Time.Posix
+    -> Result (List Parser.DeadEnd) Time.Posix
+    -> Order
+timeCompare time1 time2 =
+    posixCompare (timeWithDefault time1) (timeWithDefault time2)
+
+
+reposReqDetails : DataSource.Http.RequestDetails
+reposReqDetails =
+    let
+        githubUrl =
+            UrlBuilder.crossOrigin "https://api.github.com" [ "search", "repositories" ] [ UrlBuilder.string "q" "user:rsulli55 topic:display-on-website" ]
+    in
+    { url = githubUrl
+    , method = "GET"
+    , headers = [ ( "Accept", "application/vnd.github.v3+json" ) ]
+    , body = DataSource.Http.emptyBody
+    }
+
+
+projectNames : DataSource (List String)
+projectNames =
+    Glob.succeed (\capture -> capture)
+        -- |> Glob.captureFilePath
+        |> Glob.match (Glob.literal "content/projects/")
+        |> Glob.capture Glob.wildcard
+        |> Glob.match (Glob.literal ".md")
+        |> Glob.toDataSource
+        |> DataSource.map (Debug.log "ProjectNames")
+
+
+getRepo : String -> DataSource Repo
+getRepo name =
+    DataSource.Http.get (Secrets.succeed ("https://api.github.com/repos/rsulli55/" ++ name)) repoDecoder
+
+
+getRepos : List String -> List (DataSource Repo)
+getRepos names =
+    List.map getRepo names
+
+
+projectRepos : DataSource (List Repo)
+projectRepos =
+    DataSource.map getRepos projectNames
+        |> DataSource.resolve
+        |> DataSource.map (Debug.log "projectRepos")
+
+
+getFilePath : String -> String
+getFilePath name =
+    "content/projects/" ++ name ++ ".md"
+
+
+getDetail : String -> DataSource String
+getDetail name =
+    DataSource.File.bodyWithoutFrontmatter (getFilePath name)
+
+
+projectDetails : DataSource (List String)
+projectDetails =
+    DataSource.map (List.map getDetail) projectNames
+        |> DataSource.resolve
+        |> DataSource.map (Debug.log "projectDetails")
+
+
+combineRepoAndDetails : List Repo -> List String -> List Project
+combineRepoAndDetails =
+    List.map2 (\repo details -> { repo = repo, details = details, expanded = False })
+
+
+projects : DataSource (List Project)
+projects =
+    DataSource.map2 combineRepoAndDetails projectRepos projectDetails
+
+
+repoDecoder : Decode.Decoder Repo
+repoDecoder =
+    Decode.map5 Repo
+        (Decode.field "name" Decode.string)
+        (Decode.field "html_url" Decode.string)
+        (Decode.field "description" (Decode.nullable Decode.string))
+        (Decode.field "language" (Decode.nullable Decode.string))
+        (Decode.field "updated_at" Decode.string)
+
+
+reposDecoder : Decode.Decoder (List Repo)
+reposDecoder =
+    Decode.field "items" (Decode.list repoDecoder)
+
+
+
+-- combineBtnAndMd : ( Element Msg, Element MdMsg ) -> Element Msg
+-- combineBtnAndMd btnAndMd =
+--     let
+--         resultingMsg =
+--             case Tuple.first btnAndMd of
+--                 Element (Toggle repoName) ->
+--                     Just (Toggle repoName)
+--                 _ ->
+--                     Nothing
+--     in
+--     [ Tuple.first btnAndMd
+--     , Tuple.second btnAndMd |> Element.map (\msg -> Maybe.withDefault MdMsg resultingMsg)
+--     ]
+
+
+projectDetailsButton : Project -> Model -> Element Msg
+projectDetailsButton project model =
+    let
+        expanded =
+            case Dict.get project.repo.name model.expanded of
+                Just bool ->
+                    bool
+
+                Nothing ->
+                    False
+    in
+    let
+        buttonText =
+            if expanded then
+                "Collapse Details ⤴"
+
+            else
+                "Expand Details ⤵"
+    in
+    let
+        button =
+            Input.button
+                [ Background.color colorPrimary
+                , Element.mouseOver [ Background.color colorPrimaryHighlight ]
+                , Border.rounded 5
+                , Element.alignRight
+                ]
+                { onPress = Just (Toggle project.repo.name)
+                , label =
+                    Element.text buttonText
+                }
+    in
+    let
+        renderedMd =
+            if expanded then
+                Element.paragraph [ Background.color colorMedGrey, Element.width Element.fill ]
+                    [ MdRendering.renderMd project.details ]
+
+            else
+                Element.none
+    in
+    Element.column
+        [ Element.spacing 10
+        , Element.width Element.fill
+        ]
+        [ button, renderedMd ]
+
+
+displayProject : Model -> Project -> Element Msg
+displayProject model project =
+    let
+        repoName =
+            project.repo.name
+    in
+    let
+        description =
+            case project.repo.description of
+                Just desc ->
+                    "Description: " ++ desc
+
+                Nothing ->
+                    "No Description"
+    in
+    let
+        repoTitle =
+            case project.repo.language of
+                Just lang ->
+                    lang ++ ": " ++ repoName
+
+                Nothing ->
+                    repoName
+    in
+    Element.column
+        [ Element.spacing 10
+        , Element.padding 10
+        , Background.color colorMedGrey
+        , Element.width Element.fill
+        , Border.rounded 5
+        ]
+        [ Element.el [ Font.size 24 ] (Element.text repoTitle)
+        , Element.el [ Font.color colorSecondaryText ]
+            (Element.text description)
+        , Element.newTabLink
+            [ Font.color colorDisabledText
+            , Element.mouseOver [ Font.color colorPrimaryText ]
+            ]
+            { url = project.repo.htmlUrl, label = Element.text project.repo.htmlUrl }
+        , projectDetailsButton project model
+        ]
+
+
+displayProjects : Model -> List Project -> Element Msg
+displayProjects model projs =
+    Element.column
+        [ Element.width Element.fill
+        , Element.spacing 15
+        , Element.paddingXY 25 5
+        ]
+        (List.map
+            (displayProject model)
+            projs
+        )
+
+
+displayRepo : Repo -> Element msg
+displayRepo repo =
+    let
+        description =
+            case repo.description of
+                Just desc ->
+                    "Description: " ++ desc
+
+                Nothing ->
+                    "No Description"
+    in
+    let
+        repoTitle =
+            case repo.language of
+                Just lang ->
+                    lang ++ ": " ++ repo.name
+
+                Nothing ->
+                    repo.name
+    in
+    Element.link
+        [ Background.color colorPrimary
+        , Element.mouseOver [ Background.color colorPrimaryHighlight ]
+        , Border.rounded 5
+        , Element.padding 10
+        ]
+        { url = repo.htmlUrl
+        , label =
+            Element.column [ Element.spacing 10 ]
+                [ Element.el [ Font.color colorSecondaryText, Font.size 30 ] (Element.text repoTitle)
+                , Element.el [ Font.color colorDisabledText ]
+                    (Element.text description)
+                , Element.text repo.htmlUrl
+                ]
+        }
+
+
+displayRepos : List Repo -> Element msg
+displayRepos repos =
+    Element.column
+        [ Element.width Element.fill
+        , Element.spacing 20
+        , Element.padding 10
+        ]
+        (List.map
+            displayRepo
+            repos
+        )
+
+
+type alias RepoName =
+    String
+
+
+type alias Model =
+    { expanded : Dict RepoName Bool }
+
+
+type Msg
+    = Toggle RepoName
+
+
+type alias RouteParams =
+    {}
+
+
+page : PageWithState RouteParams Data Model Msg
+page =
+    Page.single
+        { head = head
+        , data = data
+        }
+        |> Page.buildWithLocalState { view = view, init = init, update = update, subscriptions = subscriptions }
+
+
+init : Maybe PageUrl -> Shared.Model -> StaticPayload Data RouteParams -> ( Model, Cmd Msg )
+init maybePageUrl model static =
+    let
+        allFalse =
+            List.map (\project -> ( project.repo.name, False )) static.data
+    in
+    ( { expanded = Dict.fromList allFalse }, Cmd.none )
+
+
+update : PageUrl -> Maybe Browser.Navigation.Key -> Shared.Model -> StaticPayload Data RouteParams -> Msg -> Model -> ( Model, Cmd Msg )
+update pageUrl maybeKey sharedModel static msg model =
+    let
+        toggleBool maybeBool =
+            case maybeBool of
+                Just bool ->
+                    Just (not bool)
+
+                Nothing ->
+                    Just False
+    in
+    case msg of
+        Toggle name ->
+            ( { model | expanded = Dict.update name toggleBool model.expanded }, Cmd.none )
+
+
+subscriptions : Maybe PageUrl -> RouteParams -> Path -> Model -> Sub Msg
+subscriptions maybePageUrl routeParams path model =
+    Sub.none
+
+
+type alias Data =
+    List Project
+
+
+data : DataSource Data
+data =
+    projects
+
+
+head :
+    StaticPayload Data RouteParams
+    -> List Head.Tag
+head static =
+    Seo.summary
+        { canonicalUrlOverride = Nothing
+        , siteName = "Fixed Points"
+        , image =
+            { url = Pages.Url.external "TODO"
+            , alt = "Fixed Points logo"
+            , dimensions = Nothing
+            , mimeType = Nothing
+            }
+        , description = "Ryan Sullivant's website"
+        , locale = Nothing
+        , title = "Fixed Points: Ryan Sullivant's website" -- metadata.title -- TODO
+        }
+        |> Seo.website
+
+
+view :
+    Maybe PageUrl
+    -> Shared.Model
+    -> Model
+    -> StaticPayload Data RouteParams
+    -> View Msg
+view maybeUrl sharedModel model static =
+    { title = "Fixed Points - Personal Projects"
+    , body = [ Element.el [ Font.size 30, Element.centerX ] (Element.text "Personal Projects"), displayProjects model static.data ]
+    }

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   id="svg129"
+   width="61.073353"
+   height="28.679945"
+   sodipodi:docname="logo_black.svg"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview992"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="7.7716049"
+     inkscape:cx="14.540111"
+     inkscape:cy="-5.0826052"
+     inkscape:window-width="1680"
+     inkscape:window-height="1022"
+     inkscape:window-x="0"
+     inkscape:window-y="28"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg129"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <defs
+     id="defs133" />
+  <style
+     id="style113" />
+  <g
+     id="layer1"
+     style="display:inline"
+     transform="translate(-0.58666614,-10.586723)">
+    <text
+       x="1"
+       y="39"
+       id="text115"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;line-height:normal;font-family:Merriweather;-inkscape-font-specification:'Merriweather, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">x</text>
+    <text
+       x="29.810385"
+       y="24.713362"
+       id="text125"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.3333px;line-height:normal;font-family:Merriweather;-inkscape-font-specification:'Merriweather, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">f</text>
+    <text
+       x="47.913334"
+       y="39"
+       id="text127"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;line-height:normal;font-family:Merriweather;-inkscape-font-specification:'Merriweather, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">x</text>
+  </g>
+  <g
+     id="layer2"
+     style="display:inline"
+     transform="translate(-0.58666614,-10.686723)">
+    <line
+       x1="17.601051"
+       y1="31.6"
+       x2="45.601055"
+       y2="31.6"
+       style="stroke-width:2"
+       stroke="#000000"
+       stroke-linecap="round"
+       id="line117" />
+    <line
+       x1="17.401051"
+       y1="27.6"
+       x2="17.401051"
+       y2="35.600002"
+       style="stroke-width:1.8021"
+       stroke="#000000"
+       stroke-linecap="round"
+       id="line119" />
+    <line
+       x1="42.601055"
+       y1="27.6"
+       x2="45.801056"
+       y2="31.6"
+       style="stroke-width:2"
+       stroke="#000000"
+       stroke-linecap="round"
+       id="line121" />
+    <line
+       x1="42.601055"
+       y1="35.600002"
+       x2="45.801056"
+       y2="31.6"
+       style="stroke-width:2"
+       stroke="#000000"
+       stroke-linecap="round"
+       id="line123" />
+  </g>
+</svg>
