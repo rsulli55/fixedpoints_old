@@ -1,12 +1,14 @@
 module Page.Index exposing (Data, Model, Msg, page)
 
 import DataSource exposing (DataSource)
+import DataSource.File
 import Element
 import Element.Background as Background
 import Head
 import Head.Seo as Seo
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr
+import MdRendering
 import Page exposing (Page, StaticPayload)
 import Pages.PageUrl exposing (PageUrl)
 import Pages.Url
@@ -35,10 +37,21 @@ page =
         |> Page.buildNoState { view = view }
 
 
+
+-- logoFileName : DataSource String
+-- logoFileName =
+--     DataSource.succeed "/content/images/fixed_point_def.png"
+--         |> DataSource.map (Debug.log "image path")
+
+
+markdown : DataSource String
+markdown =
+    DataSource.File.bodyWithoutFrontmatter "/content/index.md"
+
+
 data : DataSource Data
 data =
-    DataSource.succeed "/content/images/fixed_point_def.png"
-        |> DataSource.map (Debug.log "image path")
+    markdown
 
 
 head :
@@ -47,16 +60,16 @@ head :
 head static =
     Seo.summary
         { canonicalUrlOverride = Nothing
-        , siteName = "elm-pages"
+        , siteName = "fixedpoints"
         , image =
             { url = Pages.Url.external "TODO"
             , alt = "elm-pages logo"
             , dimensions = Nothing
             , mimeType = Nothing
             }
-        , description = "TODO"
+        , description = "Fixed Points - Index"
         , locale = Nothing
-        , title = "TODO title" -- metadata.title -- TODO
+        , title = "Fixed Points - Index" -- metadata.title -- TODO
         }
         |> Seo.website
 
@@ -73,10 +86,7 @@ view :
 view maybeUrl sharedModel static =
     { title = "Fixed Points"
     , body =
-        [ Html.p []
-            [ Html.text "Hi there, my name is Ryan, welcome to my site.  I am currently a M.S. student at the Univerity of Arizona.  Before that I completed a Ph.D. in Mathematics at UC Irvine.  For my Ph.D. I studied"
-            , Html.em [] [ Html.text " inner model theory" ]
-            , Html.text " which is an area of set theory. "
-            ]
+        [ Html.div []
+            [ MdRendering.renderMd static.data ]
         ]
     }

@@ -18,12 +18,14 @@ import Head
 import Head.Seo as Seo
 import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr exposing (css)
-import MdRendering exposing (MdMsg)
+import MdRendering
 import OptimizedDecoder as Decode
 import Page exposing (Page, PageWithState, StaticPayload)
 import Pages.PageUrl exposing (PageUrl)
 import Pages.Url
+import Palette exposing (debugBorder)
 import Path exposing (Path)
+import ProjectNames exposing (projectNames)
 import Secrets
 import Shared
 import Tailwind.Utilities as Tw
@@ -43,15 +45,16 @@ type alias RepoDetails =
     String
 
 
-projectNames : DataSource (List String)
-projectNames =
-    Glob.succeed (\capture -> capture)
-        -- |> Glob.captureFilePath
-        |> Glob.match (Glob.literal "content/projects/")
-        |> Glob.capture Glob.wildcard
-        |> Glob.match (Glob.literal ".md")
-        |> Glob.toDataSource
-        |> DataSource.map (Debug.log "ProjectNames")
+
+-- projectNames : DataSource (List String)
+-- projectNames =
+--     Glob.succeed (\capture -> capture)
+--         -- |> Glob.captureFilePath
+--         |> Glob.match (Glob.literal "content/projects/")
+--         |> Glob.capture Glob.wildcard
+--         |> Glob.match (Glob.literal ".md")
+--         |> Glob.toDataSource
+--         |> DataSource.map (Debug.log "ProjectNames")
 
 
 projectRepos : DataSource (List GithubRepo)
@@ -158,17 +161,53 @@ displayRepo repo =
         url =
             GithubRepo.getUrl repo
     in
-    Html.div [ css [ Tw.grid, Tw.auto_cols_auto, Tw.space_y_2, Tw.p_2, Tw.bg_gray_900, Tw.rounded ] ]
-        [ Html.span [ css [ Tw.text_2xl ] ] [ Html.text repoTitle ]
+    Html.div [ css [ Tw.grid, Tw.space_y_2, Tw.p_2, Tw.bg_gray_900, Tw.rounded ] ]
+        [ Html.span [ css [ Tw.inline_flex ] ]
+            [ Html.span [ css [ Tw.text_2xl, Tw.flex_grow ] ] [ Html.text repoTitle ]
+            , Html.span
+                [ css
+                    [ Tw.text_gray_100
+                    , Tw.bg_gray_800
+                    , Tw.rounded
+                    , Css.hover [ Tw.bg_gray_700 ]
+                    ]
+                ]
+                [ Html.a
+                    [ Attr.href ("/projects/" ++ repoName)
+                    , css
+                        [ Tw.text_gray_100
+                        , Tw.text_lg
+                        , Tw.m_1_dot_5
+                        ]
+                    ]
+                    [ Html.text "More Details" ]
+                ]
+            ]
         , Html.span [ css [ Tw.text_gray_100 ] ] [ Html.text description ]
         , Html.span [ css [ Tw.text_gray_100 ] ] [ Html.text lastUpdated ]
-        , Html.a [ Attr.href url, css [ Tw.text_gray_400, Css.hover [ Tw.text_gray_200 ] ] ] [ Html.text url ]
+        , Html.span []
+            [ Html.a
+                [ Attr.href url
+                , css [ Tw.underline, Tw.text_gray_400, Css.hover [ Tw.text_gray_200 ] ]
+                ]
+                [ Html.text url ]
+            ]
         ]
 
 
 displayRepos : List GithubRepo -> Html Msg
 displayRepos repos =
-    Html.div [ css [ Tw.grid, Tw.auto_cols_auto, Tw.flex_grow, Tw.w_full, Tw.space_y_2, Tw.px_4, Tw.py_1 ] ] <|
+    Html.div
+        [ css
+            [ Tw.grid
+            , Tw.auto_cols_auto
+            , Tw.flex_grow
+            , Tw.space_y_2
+            , Tw.px_4
+            , Tw.py_2
+            ]
+        ]
+    <|
         List.map
             displayRepo
             repos

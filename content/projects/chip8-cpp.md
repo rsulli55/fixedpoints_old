@@ -1,3 +1,4 @@
+## Chip8-cpp
 I started working on this project a few weeks into Summer 2021, and I am still working on it.  I have always found emulation very interesting (in some sense
 an emulator is a type of universal machine), and this machine is the one nearly everyone suggests to get started with.  
 There are some great resources online

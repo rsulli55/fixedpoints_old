@@ -9,6 +9,7 @@ import Html.Styled.Attributes as Attr exposing (css)
 import Markdown.Block as Block
 import Markdown.Html
 import Markdown.Renderer
+import Palette exposing (debugBorder)
 import SyntaxHighlight
 import Tailwind.Utilities as Tw
 
@@ -16,7 +17,7 @@ import Tailwind.Utilities as Tw
 renderer : Markdown.Renderer.Renderer (Html.Html msg)
 renderer =
     { heading = heading
-    , paragraph = Html.p []
+    , paragraph = Html.p [ css [ Tw.py_2 ] ]
     , thematicBreak = Html.hr [] []
     , text = Html.text
     , strong = \content -> Html.strong [ css [ Tw.font_bold ] ] content
@@ -26,9 +27,12 @@ renderer =
         \content ->
             Html.code
                 [ css
-                    [ Tw.font_semibold
-                    , Tw.font_medium
-                    , Css.color (Css.rgb 226 0 124) |> Css.important
+                    [ -- Tw.font_semibold
+                      Tw.font_medium
+                    , Tw.text_green_500
+                    , Tw.font_mono
+
+                    -- , Css.color (Css.rgb 226 0 124) |> Css.important
                     ]
                 ]
                 [ Html.text content ]
@@ -41,7 +45,10 @@ renderer =
                 , Attr.target "_blank"
                 , css
                     [ Tw.underline
-                    , Css.color (Css.rgba 255 255 255 0.7)
+                    , Tw.text_gray_300
+                    , Css.hover [ Tw.text_gray_100 ]
+
+                    -- , Css.color (Css.rgba 255 255 255 0.7)
                     ]
                 ]
                 body
@@ -56,7 +63,7 @@ renderer =
                     Html.img [ Attr.src image.src, Attr.alt image.alt ] []
     , unorderedList =
         \items ->
-            Html.ul []
+            Html.ul [ css [ Tw.space_y_1, Tw.list_disc, Tw.px_4 ] ]
                 (items
                     |> List.map
                         (\item ->
@@ -242,26 +249,27 @@ heading { level, rawText, children } =
                     , Tw.border_b
                     ]
                 ]
-                [ Html.a
-                    [ Attr.href <| "#" ++ rawTextToId rawText
-                    , css
-                        [ Tw.no_underline |> Css.important
-                        ]
-                    ]
-                    (children
-                        ++ [ Html.span
-                                [ Attr.class "anchor-icon"
-                                , css
-                                    [ Tw.ml_2
-                                    , Tw.text_gray_500
-                                    , Tw.select_none
-                                    ]
-                                ]
-                                [ Html.text "#" ]
-                           ]
-                    )
-                ]
+                children
 
+        -- [ Html.a
+        --     [ Attr.href <| "#" ++ rawTextToId rawText
+        --     , css
+        --         [ Tw.no_underline |> Css.important
+        --         ]
+        --     ]
+        --     (children
+        --         ++ [ Html.span
+        --                 [ Attr.class "anchor-icon"
+        --                 , css
+        --                     [ Tw.ml_2
+        --                     , Tw.text_gray_500
+        --                     , Tw.select_none
+        --                     ]
+        --                 ]
+        --                 [ Html.text "#" ]
+        --            ]
+        --     )
+        -- ]
         _ ->
             (case level of
                 Block.H1 ->
@@ -336,7 +344,11 @@ codeBlock details =
                 _ ->
                     SyntaxHighlight.noLang
     in
-    highlighter details.body
-        |> Result.map (SyntaxHighlight.toBlockHtml (Just 1))
-        |> Result.map Html.fromUnstyled
-        |> Result.withDefault (Html.pre [] [ Html.text "Default" ])
+    Html.div
+        [ css [ Tw.flex, Tw.justify_center, Tw.rounded ] ]
+        [ SyntaxHighlight.useTheme SyntaxHighlight.oneDark |> Html.fromUnstyled
+        , highlighter details.body
+            |> Result.map (SyntaxHighlight.toBlockHtml (Just 1))
+            |> Result.map Html.fromUnstyled
+            |> Result.withDefault (Html.pre [] [ Html.text "Default" ])
+        ]

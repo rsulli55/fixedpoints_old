@@ -13,6 +13,7 @@ import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attr exposing (css)
 import Pages.Flags
 import Pages.PageUrl exposing (PageUrl)
+import Palette exposing (debugBorder)
 import Path exposing (Path)
 import SharedTemplate exposing (SharedTemplate)
 import Tailwind.Breakpoints as Bp
@@ -132,7 +133,7 @@ view sharedData page model toMsg pageView =
                         , Tw.auto_rows_min
                         , Tw.max_w_4xl
                         , Tw.self_center
-                        , Tw.space_y_2
+                        , Tw.space_y_4
                         , Tw.h_screen
                         , Tw.flex_grow
                         , Tw.pt_4
@@ -225,11 +226,6 @@ siteHeader =
         ]
 
 
-debugBorder : List Css.Style -> List Css.Style
-debugBorder l =
-    l ++ [ Tw.border_4, Tw.border_red_500 ]
-
-
 
 -- siteHeader : Element msg
 -- siteHeader =
@@ -303,8 +299,8 @@ mainContent : List (Html msg) -> Html msg
 mainContent content =
     Html.div
         [ css
-            [ Tw.p_2
-            , Tw.bg_gray_700
+            [ Tw.p_6
+            , Tw.bg_gray_800
             , Tw.rounded_lg
             , Tw.flex_grow
             , Tw.min_h_full
@@ -354,7 +350,7 @@ siteFooter =
 
 siteFooterBuilder : List (Html msg) -> Html msg
 siteFooterBuilder elements =
-    Html.div [ css [ Tw.grid, Tw.w_full, Tw.auto_rows_min, Tw.justify_center ] ]
+    Html.div [ css [ Tw.grid, Tw.w_full, Tw.auto_rows_min, Tw.justify_center, Tw.pt_8 ] ]
         [ Html.span [ css [ Tw.inline_flex, Tw.justify_center, Tw.space_x_2 ] ]
             elements
         , Html.span [ css [ Tw.text_sm ] ] [ Html.text "Copyright Ryan Sullivant" ]
