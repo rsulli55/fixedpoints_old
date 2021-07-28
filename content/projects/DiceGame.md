@@ -1,3 +1,3 @@
-## Chip8-cpp
+## DiceGame
 
 A project I worked on for ...
