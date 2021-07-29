@@ -267,7 +267,7 @@ renderMd =
 rawTextToId rawText =
     rawText
         |> String.split " "
-        |> Debug.log "split"
+        -- |> Debug.log "split"
         |> String.join "-"
-        |> Debug.log "joined"
+        -- |> Debug.log "joined"
         |> String.toLower

@@ -61,7 +61,10 @@ projectRepos : DataSource (List GithubRepo)
 projectRepos =
     DataSource.map GithubRepo.getRepos projectNames
         |> DataSource.resolve
-        |> DataSource.map (Debug.log "projectRepos")
+
+
+
+-- |> DataSource.map (Debug.log "projectRepos")
 
 
 getFilePath : String -> String

@@ -12,4 +12,7 @@ projectNames =
         |> Glob.capture Glob.wildcard
         |> Glob.match (Glob.literal ".md")
         |> Glob.toDataSource
-        |> DataSource.map (Debug.log "ProjectNames")
+
+
+
+-- |> DataSource.map (Debug.log "projectNames")
