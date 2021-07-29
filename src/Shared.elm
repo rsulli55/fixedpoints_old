@@ -125,8 +125,8 @@ view sharedData page model toMsg pageView =
                     [ Tw.bg_black
                     , Tw.text_base
 
-                    -- , Tw.w_screen
-                    -- , Tw.h_screen
+                    -- , Tw.max_w_full
+                    , Tw.min_h_screen
                     , Tw.text_white
                     , Tw.flex
 
@@ -143,8 +143,6 @@ view sharedData page model toMsg pageView =
                         , Tw.max_w_4xl
                         , Tw.self_center
                         , Tw.space_y_4
-
-                        -- , Tw.h_screen
                         , Tw.flex_grow
                         , Tw.pt_4
                         ]
