@@ -22,9 +22,3 @@ Currently, I have about half of the instructions implemented and can currently r
 but realized I will have to setup a 3D renderer to use it (previously I had used `ImGui` with `SFML` and this was all taken care of).  So, I am
 now trying to get an OpenGL renderer running (after looking into Vulkan for about a week, I decided it may be better to get my feet wet with OpenGL first
 for such a simple project).
-
-```elm
-hello: String -> String
-hello name = 
-    "hello " ++ name
-```

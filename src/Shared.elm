@@ -115,18 +115,22 @@ view sharedData page model toMsg pageView =
 
             -- , Html.node "link" [ Attr.href "https://fonts.googleapis.com/css?family=Source+Code+Pro", Attr.rel "stylesheet", Attr.name "Source Code Pro" ] []
             , Html.node "link" [ Attr.href "https://cdnjs.cloudflare.com/ajax/libs/hack-font/3.3.0/web/hack-subset.css", Attr.rel "stylesheet", Attr.name "Hack" ] []
-            , Html.node "link" [ Attr.href "public/prism.css", Attr.rel "stylesheet" ] []
-            , Html.node "script" [ Attr.src "public/prism.js" ] []
+
+            -- , Html.node "link" [ Attr.href "public/prism.css", Attr.rel "stylesheet" ] []
+            -- , Html.node "script" [ Attr.src "public/prism.js" ] []
             , Html.div
                 [ css
                     -- <|
                     --     debugBorder
                     [ Tw.bg_black
                     , Tw.text_base
-                    , Tw.w_screen
-                    , Tw.h_screen
+
+                    -- , Tw.w_screen
+                    -- , Tw.h_screen
                     , Tw.text_white
                     , Tw.flex
+
+                    -- , Tw.flex_grow
                     , Tw.justify_center
                     ]
                 ]
@@ -139,7 +143,8 @@ view sharedData page model toMsg pageView =
                         , Tw.max_w_4xl
                         , Tw.self_center
                         , Tw.space_y_4
-                        , Tw.h_screen
+
+                        -- , Tw.h_screen
                         , Tw.flex_grow
                         , Tw.pt_4
                         ]
@@ -272,7 +277,7 @@ navBarItem item =
 
 
 navBar =
-    navBarBuilder [ { url = "/projects", label = "Projects" }, { url = "/posts", label = "Posts" }, { url = "/about", label = "About" } ]
+    navBarBuilder [ { url = "/projects", label = "Projects" }, { url = "/posts", label = "Posts" } ]
 
 
 navBarBuilder : List { url : String, label : String } -> Html msg
@@ -355,7 +360,7 @@ siteFooter =
 
 siteFooterBuilder : List (Html msg) -> Html msg
 siteFooterBuilder elements =
-    Html.div [ css [ Tw.grid, Tw.w_full, Tw.auto_rows_min, Tw.justify_center, Tw.pt_8 ] ]
+    Html.div [ css [ Tw.grid, Tw.w_full, Tw.auto_rows_min, Tw.justify_center, Tw.py_8 ] ]
         [ Html.span [ css [ Tw.inline_flex, Tw.justify_center, Tw.space_x_2 ] ]
             elements
         , Html.span [ css [ Tw.text_sm ] ] [ Html.text "Copyright Ryan Sullivant" ]
