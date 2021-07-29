@@ -46,7 +46,7 @@ page =
 
 markdown : DataSource String
 markdown =
-    DataSource.File.bodyWithoutFrontmatter "/content/index.md"
+    DataSource.File.bodyWithoutFrontmatter "content/index.md"
 
 
 data : DataSource Data

@@ -112,6 +112,11 @@ view sharedData page model toMsg pageView =
     { body =
         Html.div []
             [ Css.Global.global Tw.globalStyles
+
+            -- , Html.node "link" [ Attr.href "https://fonts.googleapis.com/css?family=Source+Code+Pro", Attr.rel "stylesheet", Attr.name "Source Code Pro" ] []
+            , Html.node "link" [ Attr.href "https://cdnjs.cloudflare.com/ajax/libs/hack-font/3.3.0/web/hack-subset.css", Attr.rel "stylesheet", Attr.name "Hack" ] []
+            , Html.node "link" [ Attr.href "public/prism.css", Attr.rel "stylesheet" ] []
+            , Html.node "script" [ Attr.src "public/prism.js" ] []
             , Html.div
                 [ css
                     -- <|

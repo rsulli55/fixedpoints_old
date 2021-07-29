@@ -27,10 +27,12 @@ renderer =
         \content ->
             Html.code
                 [ css
-                    [ -- Tw.font_semibold
-                      Tw.font_medium
-                    , Tw.text_green_500
-                    , Tw.font_mono
+                    [ --Tw.font_semibold
+                      -- , Tw.font_medium
+                      Tw.text_green_500
+
+                    -- , Tw.font_mono
+                    , Css.fontFamilies [ "Hack" ]
 
                     -- , Css.color (Css.rgb 226 0 124) |> Css.important
                     ]
@@ -319,7 +321,7 @@ codeBlock : { body : String, language : Maybe String } -> Html.Html msg
 codeBlock details =
     let
         highlighter =
-            case Debug.log "Language" details.language of
+            case details.language of
                 Just "elm" ->
                     SyntaxHighlight.elm
 
@@ -344,11 +346,27 @@ codeBlock details =
                 _ ->
                     SyntaxHighlight.noLang
     in
-    Html.div
+    Html.pre
         [ css [ Tw.flex, Tw.justify_center, Tw.rounded ] ]
-        [ SyntaxHighlight.useTheme SyntaxHighlight.oneDark |> Html.fromUnstyled
-        , highlighter details.body
-            |> Result.map (SyntaxHighlight.toBlockHtml (Just 1))
-            |> Result.map Html.fromUnstyled
-            |> Result.withDefault (Html.pre [] [ Html.text "Default" ])
+        [ -- Html.node "link" [ Attr.href "public/hack-subset.css", Attr.rel "stylesheet", Attr.name "Hack" ] []
+          Html.code [ Attr.class "language-elm", css [ Css.fontFamilies [ "Hack" ] ] ]
+            [ Html.text details.body
+
+            -- SyntaxHighlight.useTheme SyntaxHighlight.oneDark |> Html.fromUnstyled
+            -- , highlighter
+            --     details.body
+            --     |> Result.map SyntaxHighlight.toInlineHtml
+            --     |> Result.map Html.fromUnstyled
+            --     |> Result.withDefault (Html.text details.body)
+            ]
         ]
+
+
+
+--     [ css [ Tw.flex, Tw.justify_center, Tw.rounded, Css.fontFamilies [ "Hack" ] ] ]
+--     [ SyntaxHighlight.useTheme SyntaxHighlight.oneDark |> Html.fromUnstyled
+--     , highlighter details.body
+--         |> Result.map (SyntaxHighlight.toBlockHtml (Just 1))
+--         |> Result.map Html.fromUnstyled
+--         |> Result.withDefault (Html.pre [] [ Html.text "Default" ])
+--     ]
