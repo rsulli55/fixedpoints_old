@@ -141,7 +141,7 @@ view sharedData page model toMsg pageView =
                         [ Tw.grid
                         , Tw.auto_rows_min
                         , Tw.max_w_4xl
-                        , Tw.self_center
+                        , Tw.justify_self_center
                         , Tw.space_y_4
                         , Tw.flex_grow
                         , Tw.pt_4
